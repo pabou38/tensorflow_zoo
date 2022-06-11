@@ -1,0 +1,58 @@
+
+// This file is similar to the launch.json file for debugging configurations, but is used for launching (or attaching to) your development container instead.
+// If devcontainer.json's supported workflows do not meet your needs, you can also attach to an already running container instead.
+// We recommend pre-building images with the tools you need rather than creating and building a container image each time you open your project in a dev container.
+
+
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.234.0/containers/docker-existing-dockerfile
+
+// https://code.visualstudio.com/docs/remote/create-dev-container
+// https://code.visualstudio.com/docs/remote/containers
+
+
+// remote PI
+// https://code.visualstudio.com/remote/advancedcontainers/develop-remote-host
+
+{
+
+	// An image is like a mini-disk drive with various tools and an operating system pre-installed. You can pull images from a container registry, which is a collection of repositories that store images.
+	// Required when using an image. The name of an image in a container registry (DockerHub, GitHub Container Registry, Azure Container Registry)
+	//"image": "pabou/lili",
+	
+
+	// A name for the dev container displayed in the UI.
+	"name": "lili",
+
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+	
+	
+	// pick a pre-defined container configuration from a list based on your folder's contents, reuse an existing Dockerfile, or reuse an existing Docker Compose file.
+	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+
+	// Required when using a Dockerfile. The location of a Dockerfile that defines the contents of the container. The path is relative to the devcontainer.json file.
+	"dockerFile": "../Dockerfile",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {},
+	
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": []
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	// "postCreateCommand": "apt-get update && apt-get install -y curl",
+
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+
+	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode"
+}
