@@ -1,6 +1,6 @@
 # tensorflow-zoo
 
-![] (https://github.com/pabou38/tensorflow_zoo/blob/master/zoo_1.jpg)
+![] (zoo_1.jpg)
 
 see [article on medium] (www.google.com)
 
