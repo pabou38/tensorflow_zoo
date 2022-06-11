@@ -1,0 +1,37 @@
+{
+    // Utilisez IntelliSense pour en savoir plus sur les attributs possibles.
+    // Pointez pour afficher la description des attributs existants.
+    // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "args":[
+            // those option are for fit and benchmark only
+            //    "-pmaker",
+            //    "-pload",
+                "-ptransfert",
+                "-b",
+
+            // applies to both
+            // -e runs in headless, ie will not img_show() , nothing: in windowed
+            //    "-e",
+
+            // those option are for run only
+            //    "-mtf",
+                "-t60",
+                "-mli", 
+            //    "-qTPU_edgetpu"
+            //    "-qfp32",
+                "-qGPU",
+            //    "-qTPU",
+
+            ],
+            "name": "Python : Fichier actuel",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

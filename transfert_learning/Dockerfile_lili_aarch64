@@ -1,0 +1,128 @@
+#FROM python:3.9
+
+# https://github.com/docker-library/official-images
+# https://hub.docker.com/u/library
+
+FROM arm64v8/python:3.9-bullseye
+
+#FROM arm64v8/python:3.9-slim-bullseye
+#FROM arm64v8/python:3.9-alpine
+# docker pull this image will fails on windows: no matching manifest for linux/amd64 in the manifest list entries
+
+# from dir where files are, and Dockerfile is
+# docker build -t pabou/lili:v1 .
+
+#to access USB webcam from container
+#docker run --privileged -v /dev/video0:/dev/video0
+
+# PI cam
+# https://www.losant.com/blog/how-to-access-the-raspberry-pi-camera-in-docker
+
+# seems unsupported on windows for USB
+# https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/hardware-devices-in-containers
+
+# docker run -it --rm tensorflow/tensorflow:latest-gpu bash
+# docker run -it --rm tensorflow/tensorflow:latest-gpu python ./script.py
+
+# -f ./transfert_learning/Dockerfile  
+# -t pabou/name:v2   tag
+
+# when one layer is changed, all subsequent layers get rebuilt
+
+ENV author pabou
+
+# use this env variable to detect at run time  if running in a container or in the host  
+ENV indocker yes
+
+LABEL author=pboudalier@gmail.com
+
+# before USER pi or permisson denied
+
+# missing for opencv. 
+# portaudio dependency for tflite-support
+# add nano for when running -ti  bash
+# add usbutils to check USB cam 
+# add sudo, pi in sudo group
+
+RUN apt update && apt install ffmpeg libsm6 libxext6 libportaudio2 nano usbutils sudo -y && rm -rf /var/lib/apt/lists/*
+
+#RUN is an image build step, the state of the container after a RUN command will be committed to the container
+# image. A Dockerfile can have many RUN steps that layer on top of one another to build the image
+# RUN Builds a new layer over an existing image by committing the results.
+
+RUN useradd pi -m -d /home/pi && adduser pi dialout && adduser pi sudo && adduser pi plugdev 
+
+# famous error opencv in docker
+RUN usermod -a -G video pi
+
+# need /home/pi ??
+USER pi
+
+# mkdir and cd
+WORKDIR /home/pi 
+
+
+# build context is one level up, to get all sources files
+ARG dir='transfert_learning'
+RUN mkdir $dir 
+# && for multiple RUN in one layer
+
+# COPY copies files from a local source location to a destination in the Docker container.
+# Same as 'ADD', but without the tar and remote URL handling.
+
+# Multiple <src> resource may be specified but they must be relative to the source directory that is being built (the context of the build).
+# <dest> is an absolute path, or a path relative to WORKDIR, into which the source will be copied inside the destination container.
+# If <src> is a directory, the entire contents of the directory are copied, including filesystem metadata. Note: The directory itself is not copied, just its contents
+# If multiple <src> resources are specified, either directly or due to the use of a wildcard, then <dest> must be a directory, and it must end with a slash /.
+#If <dest> does not end with a trailing slash, it will be considered a regular file and the contents of <src> will be written at <dest>.
+#If <dest> does not exist, it is created along with all missing directories in its path.
+
+# ADD can copy from url, and uncompress. COPY cannot. COPY more recent
+# The path must be inside the context of the build; you cannot ADD ../something/something,
+
+
+# stripped down requirements, otherwize 6GB image
+
+COPY $dir/requirement_docker.txt .
+RUN pip install --upgrade pip
+
+# two RUN , othewize still use older version 
+RUN pip install -r requirement_docker.txt
+
+# cannot use ../ in source file
+# recreate host file system hiearchy , vs all files in .
+
+# mutiple files, dest is dir , must have training /
+COPY pabou.py lite_inference.py ./
+
+
+# will NOT create target dir in container copy all files into one called $dir
+COPY $dir/lili_run.py $dir/arg.py  $dir/
+
+# models and label file
+# if dest is $dir/  models dir not created and all models files copy in $dir
+# can use wildcard in src
+
+COPY $dir/models $dir/models/
+# could also bind mount to host file system to update models file without rebuilding container
+
+
+EXPOSE 8080
+
+# CMD is the command the container executes by default when you launch the built image. A Dockerfile will only use the final CMD defined
+# Sets default parameters that can be overridden from the Docker Command Line Interface (CLI) when a container is running.
+
+WORKDIR $dir
+CMD ["python", "lili_run.py" , "-pload", "-t62", "-mli", "-qfp32"]
+
+# ENTRYPOINT commands cannot be ignored or overridden
+# ENTRYPOINT and CMD are appended. can use CMD, including in docker-run, as ENTRYPOINT arguments
+
+
+#ENTRYPOINT ["python", "lili_run.py" , "-pload"]
+# or rely on default value in arg.py
+#CMD ["-t62", "-mli", "-qfp32"]
+
+# docker run .... -t61
+
+# altenativaly, use env variable to specify arguments

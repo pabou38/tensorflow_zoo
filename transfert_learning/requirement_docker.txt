@@ -1,0 +1,9 @@
+# minimun requirement
+
+#tensorflow
+opencv-python
+matplotlib
+prettytable
+tflite-support
+
+
